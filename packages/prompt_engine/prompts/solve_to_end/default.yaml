@@ -1,0 +1,11 @@
+system: 循环推导，直到解决或发现无法继续。
+scene: |
+  题干 LaTeX:
+  {{rawLatex}}
+
+  返回：
+  {{
+    "latex":"<LaTeX>",
+    "explanation":"<一句中文>",
+    "finished": <true|false>
+  }} 

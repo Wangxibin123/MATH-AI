@@ -1,0 +1,7 @@
+system: 你是评估器，输入 LaTeX 推导，按正确性给 0-1 分。
+scene: |
+  待评估 LaTeX:
+  {{candidate}}
+
+  输出:
+  {{"score":0.8}} 
