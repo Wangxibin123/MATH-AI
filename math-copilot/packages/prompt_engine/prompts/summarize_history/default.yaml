@@ -8,4 +8,4 @@ scene: |
   {all_steps}
 
   返回:
-  {{"summary":"<中文摘要>"}} 
+  {{"summary":"<中文摘要>"}}

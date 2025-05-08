@@ -1,4 +1,1 @@
-# This file makes 'gateway' a package 
-
-
-
+# This file makes 'gateway' a package

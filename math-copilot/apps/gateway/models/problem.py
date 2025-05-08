@@ -1,10 +1,13 @@
-from sqlmodel import SQLModel, Field, Relationship
-from typing import Optional, List, TYPE_CHECKING
-import uuid, datetime
+import datetime
+import uuid
+from typing import TYPE_CHECKING, List, Optional
+
+from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from .block import Block
     from .event import Event
+
 
 class Problem(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
@@ -15,4 +18,4 @@ class Problem(SQLModel, table=True):
 
     # back refs (lazy loaded)
     blocks: List["Block"] = Relationship(back_populates="problem")
-    events: List["Event"] = Relationship(back_populates="problem") 
+    events: List["Event"] = Relationship(back_populates="problem")

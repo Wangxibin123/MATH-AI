@@ -16,7 +16,7 @@ Write-Host "Python 版本: $versionString"
 if ($versionString -notmatch "Python 3\.1[1-9]") {
      Write-Warning "警告：检测到的 Python 版本不是 3.11 或更高。脚本可能无法正常工作。"
      # Decide whether to exit or continue based on strictness
-     # exit 1 
+     # exit 1
 }
 
 Write-Host "===> 2. 安装／升级 Poetry"
@@ -31,7 +31,7 @@ if (-not $poetryExe) {
         $poetryExe = Get-Command poetry -ErrorAction SilentlyContinue
         if (-not $poetryExe) {
              # If still not found, try explicit path (common default)
-             $explicitPoetryPath = Join-Path $env:USERPROFILE ".local\bin\poetry.exe" 
+             $explicitPoetryPath = Join-Path $env:USERPROFILE ".local\bin\poetry.exe"
              if (Test-Path $explicitPoetryPath) {
                  $poetryExe = $explicitPoetryPath
                  Write-Host "使用显式路径找到 Poetry: $poetryExe"
@@ -67,9 +67,9 @@ if ($LASTEXITCODE -ne 0) { Write-Error "错误：种子脚本运行失败。"; e
 
 Write-Host "===> 6. 执行 pytest"
 & $poetryExe run pytest -q
-if ($LASTEXITCODE -ne 0) { 
+if ($LASTEXITCODE -ne 0) {
     Write-Error "错误：Pytest 测试未通过！"
-    exit 1 
+    exit 1
 }
 
-Write-Host "========= 🎉 全流程完成，数据库在 dev.db =========" 
+Write-Host "========= 🎉 全流程完成，数据库在 dev.db ========="

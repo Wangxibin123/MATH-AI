@@ -23,4 +23,4 @@ apps/gateway/venv/
 apps/gateway/models.py
 
 # Environment variables
-.env 
+.env

@@ -1,9 +1,7 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
 from alembic import context
+from sqlalchemy import engine_from_config, pool
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -21,40 +19,43 @@ if config.config_file_name is not None:
 # target_metadata = None
 
 # ★ 指向工程里的 engine 和 SQLModel
-import sys, pathlib
+import pathlib
+import sys
+
 # Add project root to sys.path to allow importing apps.gateway.db
 # Assuming env.py is in apps/gateway/alembic, and project root is 3 levels up.
 PROJECT_ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from sqlmodel import SQLModel                 # ★
-from sqlmodel.sql.sqltypes import GUID, AutoString # MODIFIED: Import AutoString
-from apps.gateway.db import DB_URL           # ★ Changed from engine to DB_URL as per typical alembic setup
-from apps.gateway.models import __all__ as all_models # ★ Import models to ensure they are registered with SQLModel.metadata
+from sqlmodel import SQLModel  # ★
+from sqlmodel.sql.sqltypes import GUID, AutoString  # MODIFIED: Import AutoString
 
-target_metadata = SQLModel.metadata           # ★
-config.set_main_option('sqlalchemy.url', DB_URL) # ★ Set the sqlalchemy.url from our db.py
+from apps.gateway.db import DB_URL  # ★ Changed from engine to DB_URL as per typical alembic setup
+
+target_metadata = SQLModel.metadata  # ★
+config.set_main_option("sqlalchemy.url", DB_URL)  # ★ Set the sqlalchemy.url from our db.py
+
 
 # Custom render_item function for SQLModel types
 def render_item(type_, obj, autogen_context):
     """Render an item for autogenerate."""
     rendered_type = None
-    if type_ == 'type':
+    if type_ == "type":
         if isinstance(obj, GUID):
             rendered_type = "sa.UUID"
         elif isinstance(obj, AutoString):
-            rendered_type = "sa.String" # Render AutoString as sa.String
+            rendered_type = "sa.String"  # Render AutoString as sa.String
         # Add more SQLModel specific types here if needed
 
     if rendered_type is not None:
         autogen_context.imports.add("import sqlalchemy as sa")
         return rendered_type
-        
-    return False # Default rendering for other types
+
+    return False  # Default rendering for other types
 
 
 # other values from the config, defined by the needs of env.py,
-# can be acquired: 
+# can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
@@ -77,7 +78,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
-        render_item=render_item
+        render_item=render_item,
     )
 
     with context.begin_transaction():
@@ -98,10 +99,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata,
-            render_item=render_item
-        )
+        context.configure(connection=connection, target_metadata=target_metadata, render_item=render_item)
 
         with context.begin_transaction():
             context.run_migrations()

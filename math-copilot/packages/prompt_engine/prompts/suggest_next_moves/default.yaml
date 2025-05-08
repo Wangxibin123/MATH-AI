@@ -7,4 +7,4 @@ scene: |
   {rawLatex}
 
   返回:
-  {{"suggestions":["<LaTeX1>","<LaTeX2>","<LaTeX3>"]}} 
+  {{"suggestions":["<LaTeX1>","<LaTeX2>","<LaTeX3>"]}}

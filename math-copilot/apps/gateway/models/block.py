@@ -1,9 +1,12 @@
-from sqlmodel import SQLModel, Field, Relationship
-from typing import Optional, TYPE_CHECKING
-import uuid, datetime
+import datetime
+import uuid
+from typing import TYPE_CHECKING, Optional
+
+from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from .problem import Problem
+
 
 class Block(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
@@ -18,4 +21,4 @@ class Block(SQLModel, table=True):
     updatedAt: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
 
     # relationship
-    problem: "Problem" = Relationship(back_populates="blocks") 
+    problem: "Problem" = Relationship(back_populates="blocks")

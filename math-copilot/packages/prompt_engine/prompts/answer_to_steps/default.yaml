@@ -4,4 +4,4 @@ scene: |
   {answer_raw}
 
   返回:
-  {{"blocks":[{{"latex":"...","explanation":"..."}}, ...]}} 
+  {{"blocks":[{{"latex":"...","explanation":"..."}}, ...]}}

@@ -1,11 +1,14 @@
-from sqlmodel import SQLModel, create_engine, Session
-import os, pathlib
+import os
+import pathlib
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent.parent   # math-copilot/
+from sqlmodel import Session, SQLModel, create_engine
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent.parent  # math-copilot/
 DB_FILE = ROOT / "dev.db"
 DB_URL = os.getenv("DB_URL", f"sqlite:///{DB_FILE}")
 
 engine = create_engine(DB_URL, echo=False)
+
 
 def init_db() -> None:
     """
@@ -13,10 +16,11 @@ def init_db() -> None:
     """
     SQLModel.metadata.create_all(engine)
 
+
 def get_session() -> Session:
     """
     Usage:
         with get_session() as session:
             ...
     """
-    return Session(engine) 
+    return Session(engine)

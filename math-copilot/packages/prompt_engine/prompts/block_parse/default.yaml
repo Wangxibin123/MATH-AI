@@ -8,4 +8,4 @@ scene: |
   {{
     "explanation":"<bullet 中文>",
     "children":[{{ "latex":"..." }}, ...]  # 无子步请返回 []
-  }} 
+  }}

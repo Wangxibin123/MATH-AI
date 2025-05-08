@@ -1,5 +1,5 @@
-from .problem import Problem
 from .block import Block
 from .event import Event
+from .problem import Problem
 
-__all__ = ["Problem", "Block", "Event"] 
+__all__ = ["Problem", "Block", "Event"]

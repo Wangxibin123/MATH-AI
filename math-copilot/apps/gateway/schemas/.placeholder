@@ -1,0 +1,1 @@
+# mkdir -p apps/gateway/schemas/ (Handled by file creation if path doesn't exist)

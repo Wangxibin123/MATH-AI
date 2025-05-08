@@ -1,9 +1,11 @@
+import json  # For the __main__ test block
 from pathlib import Path
+from typing import Any, Dict, List
+
 import yaml
-from typing import List, Dict, Any
-import json # For the __main__ test block
 
 PROMPT_DIR = Path(__file__).parent / "prompts"
+
 
 def load_template(agent: str, variant: str = "default") -> Dict[str, str]:
     fp = PROMPT_DIR / agent / f"{variant}.yaml"
@@ -13,6 +15,7 @@ def load_template(agent: str, variant: str = "default") -> Dict[str, str]:
         return yaml.safe_load(fp.read_text(encoding="utf-8"))
     except Exception as e:
         raise IOError(f"Error loading or parsing YAML template: {fp}\n{e}") from e
+
 
 def build_prompt(agent: str, ctx: Dict[str, Any], variant: str = "default") -> List[Dict[str, str]]:
     """
@@ -31,11 +34,11 @@ def build_prompt(agent: str, ctx: Dict[str, Any], variant: str = "default") -> L
 
     # ① Check for optional {{maxLen}} injection (before formatting)
     # Use double braces {{maxLen}} specifically for this check as per user doc
-    max_len_placeholder = "{{maxLen}}" 
+    max_len_placeholder = "{{maxLen}}"
     if max_len_placeholder in tpl.get("scene", "") and "maxLen" not in ctx:
-        ctx["maxLen"] = 1000 # Default value
-        # We need to remove the placeholder from the template string 
-        # if it won't be replaced by format(), otherwise format() might complain 
+        ctx["maxLen"] = 1000  # Default value
+        # We need to remove the placeholder from the template string
+        # if it won't be replaced by format(), otherwise format() might complain
         # depending on the Python version and exact string content.
         # However, removing it might alter intended structure if not careful.
         # A safer approach if {{maxLen}} is ONLY for this check:
@@ -48,15 +51,18 @@ def build_prompt(agent: str, ctx: Dict[str, Any], variant: str = "default") -> L
         scene = tpl["scene"].format(**ctx)
     except KeyError as e:
         missing_key = e.args[0]
-        raise KeyError(f"Context ('ctx') is missing required placeholder key '{missing_key}' for agent '{agent}'.") from None
+        raise KeyError(
+            f"Context ('ctx') is missing required placeholder key '{missing_key}' for agent '{agent}'."
+        ) from None
     except Exception as e:
         # Catch other potential formatting errors
         raise ValueError(f"Error formatting scene for agent '{agent}' with provided context: {e}") from e
 
     return [
         {"role": "system", "content": tpl["system"]},
-        {"role": "user",   "content": scene},
+        {"role": "user", "content": scene},
     ]
+
 
 # --- CLI quick test ---------------------------------------------------------
 if __name__ == "__main__":
@@ -66,6 +72,8 @@ if __name__ == "__main__":
         msgs = build_prompt("problem_ingest", test_ctx)
         print(json.dumps(msgs, ensure_ascii=False, indent=2))
     except FileNotFoundError as e:
-        print(f"CLI Test Error: Could not find a template for 'problem_ingest'. Make sure 'prompts/problem_ingest/default.yaml' exists. Details: {e}")
+        print(
+            f"CLI Test Error: Could not find a template for 'problem_ingest'. Make sure 'prompts/problem_ingest/default.yaml' exists. Details: {e}"
+        )
     except Exception as e:
-        print(f"CLI Test Error: {e}") 
+        print(f"CLI Test Error: {e}")

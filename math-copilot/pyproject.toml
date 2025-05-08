@@ -17,10 +17,17 @@ alembic = "^1.13"
 pydantic-settings = "^2.2"     # For potential future .env reading
 psycopg2-binary = {version = "^2.9.9", optional = true} # Keep for potential PG switch, but optional
 PyYAML = "^6.0" # ★ Added PyYAML
+fastapi = "^0.115.12"
+uvicorn = {extras = ["standard"], version = "^0.34.2"}
+loguru = "^0.7.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0" # Example version, can be latest
 ruff = "^0.1.0" # Example version, add ruff for linting/formatting
+mypy = "^1.15.0"
+pre-commit = "^4.2.0"
+pytest-asyncio = ">=0.23.7,<0.24.0"
+types-pyyaml = "^6.0.12.20250402"
 
 [tool.poetry.extras]
 postgres = ["psycopg2-binary"]
@@ -36,4 +43,4 @@ pythonpath = [
 
 [tool.ruff]
 select = ["E", "F", "I"] # Select Error, Pyflakes, isort codes
-line-length = 120 
+line-length = 120
