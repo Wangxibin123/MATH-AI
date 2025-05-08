@@ -1,0 +1,11 @@
+system: 你是一名数学教师，需解释下列推导步骤，必要时拆成子步。
+scene: |
+  当前步骤 LaTeX:
+  {currentLatex}
+
+  如果需要拆分更小子步，请返回 children 数组。
+  返回 JSON:
+  {{
+    "explanation":"<bullet 中文>",
+    "children":[{{ "latex":"..." }}, ...]  # 无子步请返回 []
+  }} 
