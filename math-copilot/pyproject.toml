@@ -4,7 +4,11 @@ version = "0.2.0"
 description = "Prompt Engine tag v0.2.0"
 authors = ["Your Name <you@example.com>"] # Please replace with your details later
 readme = "README.md" # Assuming you have a README
-package-mode = false # Tell Poetry not to treat the project as a standard package
+# package-mode = false # Tell Poetry not to treat the project as a standard package
+packages = [
+  { include = "apps" },
+  { include = "packages" }
+]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12" # Matching the spec

@@ -16,4 +16,11 @@ venv/
 .idea/
 
 # macOS
-.DS_Store 
+.DS_Store
+
+# Misplaced files to ignore
+apps/gateway/venv/
+apps/gateway/models.py
+
+# Environment variables
+.env 
