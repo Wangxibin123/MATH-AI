@@ -1,3 +1,4 @@
+# type: ignore
 from apps.gateway.db import get_session, init_db
 from apps.gateway.models import Block, Problem
 

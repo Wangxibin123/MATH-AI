@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 
-from apps.gateway.logging_setup import setup_logging  # Assuming this exists from v0.3.0-plus
+from apps.gateway.logging_setup import (
+    setup_logging,
+)  # Assuming this exists from v0.3.0-plus
 from apps.gateway.settings import settings
 
 # router 选择：stub or real（后续接真实模型再切）
@@ -15,14 +17,20 @@ else:
     except ImportError:
         if not settings.USE_STUB:
             # Only raise error if we are explicitly trying to use the real router and it's not found
-            raise ImportError("llm_router_real.py not found or not configured, but USE_STUB is False.")
+            raise ImportError(
+                "llm_router_real.py not found or not configured, but USE_STUB is False."
+            )
         # If USE_STUB is True, we don't care if llm_router_real is missing for now.
         pass  # Or assign a placeholder if needed for type checking when USE_STUB=True
 
 # -----------------------------------------------------------------------
 setup_logging()  # Assuming this function is defined in logging_setup.py
 
-app = FastAPI(title="Math Copilot API", description="API for Math Copilot services", version="0.3.1")
+app = FastAPI(
+    title="Math Copilot API",
+    description="API for Math Copilot services",
+    version="0.3.1",
+)
 
 # @app.on_event("startup")
 # async def on_startup():

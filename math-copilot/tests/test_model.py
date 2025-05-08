@@ -38,7 +38,9 @@ def test_block_count():
 
 def test_problem_exists_and_has_blocks():
     with get_session() as s:
-        problem = s.exec(select(Problem).where(Problem.rawLatex == r"\frac{x}{y}")).first()
+        problem = s.exec(
+            select(Problem).where(Problem.rawLatex == r"\frac{x}{y}")
+        ).first()
         assert problem is not None, "Problem should exist after seeding"
         assert problem.id is not None, "Problem ID should not be None"
 
@@ -47,9 +49,13 @@ def test_problem_exists_and_has_blocks():
         assert len(problem.blocks) == 2, "Problem should have 2 blocks"
 
         # Optional: verify content of blocks if needed for more robustness
-        block_latex_values = sorted([b.latex for b in problem.blocks])  # Sort to make order independent
+        block_latex_values = sorted(
+            [b.latex for b in problem.blocks]
+        )  # Sort to make order independent
         expected_latex_values = sorted([r"\frac{x}{y}", r"x/y"])
-        assert block_latex_values == expected_latex_values, "Block latex content mismatch"
+        assert (
+            block_latex_values == expected_latex_values
+        ), "Block latex content mismatch"
 
         assert problem.blocks[0].orderIndex == 0 or problem.blocks[1].orderIndex == 0
         assert problem.blocks[0].orderIndex == 1 or problem.blocks[1].orderIndex == 1

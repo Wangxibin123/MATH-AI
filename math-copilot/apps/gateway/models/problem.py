@@ -14,7 +14,9 @@ class Problem(SQLModel, table=True):
     rawLatex: Optional[str] = None
     imageUrl: Optional[str] = None
     audioUrl: Optional[str] = None
-    createdAt: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
+    createdAt: datetime.datetime = Field(
+        default_factory=datetime.datetime.utcnow, nullable=False
+    )
 
     # back refs (lazy loaded)
     blocks: List["Block"] = Relationship(back_populates="problem")

@@ -17,8 +17,12 @@ class Block(SQLModel, table=True):
     html: Optional[str] = None
     author: str = Field(default="assistant")
     isTerminal: bool = Field(default=False)
-    createdAt: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
-    updatedAt: datetime.datetime = Field(default_factory=datetime.datetime.utcnow, nullable=False)
+    createdAt: datetime.datetime = Field(
+        default_factory=datetime.datetime.utcnow, nullable=False
+    )
+    updatedAt: datetime.datetime = Field(
+        default_factory=datetime.datetime.utcnow, nullable=False
+    )
 
     # relationship
     problem: "Problem" = Relationship(back_populates="blocks")

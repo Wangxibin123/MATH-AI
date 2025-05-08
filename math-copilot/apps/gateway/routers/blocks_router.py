@@ -22,7 +22,9 @@ def get_session():
 
 
 @router.post("/", response_model=BlockRead, status_code=status.HTTP_201_CREATED)
-def create_block(*, session: Session = Depends(get_session), block_in: BlockCreate) -> Block:
+def create_block(
+    *, session: Session = Depends(get_session), block_in: BlockCreate
+) -> Block:
     """
     Create a new block.
     """
@@ -35,18 +37,24 @@ def create_block(*, session: Session = Depends(get_session), block_in: BlockCrea
 
 
 @router.get("/{block_id}", response_model=BlockRead)
-def read_block(*, session: Session = Depends(get_session), block_id: uuid.UUID) -> Block:
+def read_block(
+    *, session: Session = Depends(get_session), block_id: uuid.UUID
+) -> Block:
     """
     Get a block by its ID.
     """
     db_block = session.get(Block, block_id)
     if not db_block:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Block not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Block not found"
+        )
     return db_block
 
 
 @router.get("/", response_model=List[BlockRead])
-def read_blocks(*, session: Session = Depends(get_session), skip: int = 0, limit: int = 100) -> List[Block]:
+def read_blocks(
+    *, session: Session = Depends(get_session), skip: int = 0, limit: int = 100
+) -> List[Block]:
     """
     Get a list of blocks, with pagination.
     """

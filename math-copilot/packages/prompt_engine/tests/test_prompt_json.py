@@ -14,7 +14,9 @@ PROMPT_ENGINE_ROOT = Path("packages/prompt_engine")
 PROMPT_DIR = PROMPT_ENGINE_ROOT / "prompts"
 
 # Dynamically find all agents by looking at subdirectories in prompts/
-AGENTS = sorted([p.name for p in PROMPT_DIR.iterdir() if p.is_dir() and not p.name.startswith(".")])
+AGENTS = sorted(
+    [p.name for p in PROMPT_DIR.iterdir() if p.is_dir() and not p.name.startswith(".")]
+)
 
 # Context providing all *potentially* needed keys for the default templates
 # Individual templates might only use a subset
@@ -38,7 +40,10 @@ AGENT_SPECIFIC_CTX = {
     "problem_ingest": {"raw_text": CTX["raw_text"]},
     "latex_refine": {"rawLatex": CTX["rawLatex"]},
     "block_parse": {"currentLatex": CTX["currentLatex"]},
-    "suggest_next_moves": {"recent_steps": CTX["recent_steps"], "rawLatex": CTX["rawLatex"]},
+    "suggest_next_moves": {
+        "recent_steps": CTX["recent_steps"],
+        "rawLatex": CTX["rawLatex"],
+    },
     "solve_next_step": {
         "rawLatex": CTX["rawLatex"],
         "suggest_source": CTX["suggest_source"],
@@ -90,7 +95,9 @@ def test_prompt_has_two_messages(agent):
     except FileNotFoundError as e:
         pytest.fail(f"Template file not found for agent '{agent}': {e}")
     except Exception as e:
-        pytest.fail(f"build_prompt for agent '{agent}' failed with unexpected error: {e}")
+        pytest.fail(
+            f"build_prompt for agent '{agent}' failed with unexpected error: {e}"
+        )
 
 
 @pytest.mark.parametrize("agent", AGENTS)
@@ -131,7 +138,9 @@ def test_template_scene_formatting(agent):
             f"Scene formatting failed for agent '{agent}' with KeyError: {e}. Check CTX keys and template placeholders {{...}} vs {...}."
         )
     except Exception as e:
-        pytest.fail(f"Scene formatting failed for agent '{agent}' with unexpected error: {e}")
+        pytest.fail(
+            f"Scene formatting failed for agent '{agent}' with unexpected error: {e}"
+        )
 
 
 # This test seems unrelated to prompt_engine itself but was in the original spec
@@ -148,7 +157,9 @@ def test_sample_json_parse():
 # Test for summarize_history default maxLen (if not provided in ctx)
 def test_summarize_history_default_max_len():
     ctx_no_max_len = {"rawLatex": CTX["rawLatex"], "all_steps": CTX["all_steps"]}
-    msgs = build_prompt("summarize_history", ctx=ctx_no_max_len)  # maxLen should default to 1000
+    msgs = build_prompt(
+        "summarize_history", ctx=ctx_no_max_len
+    )  # maxLen should default to 1000
     assert "{{maxLen}}" not in msgs[1]["content"]
     # Check if default was applied; this requires knowing the template structure or the builder's logic.
     # Since builder applies it to ctx, this test is more about builder logic.

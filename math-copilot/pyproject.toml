@@ -41,6 +41,18 @@ pythonpath = [
   "."
 ]
 
-[tool.ruff]
+[tool.lint]
 select = ["E", "F", "I"] # Select Error, Pyflakes, isort codes
 line-length = 120
+# ignore = [] # Add specific ignores if needed, e.g., ignore = ["E402"]
+
+[tool.ruff.format]
+# Optional: Add formatting specific settings if needed
+# quote-style = "double"
+
+[tool.mypy]
+# Example minimal configuration
+python_version = "3.11"
+ignore_missing_imports = true
+# warn_return_any = true
+# warn_unused_configs = true

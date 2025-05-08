@@ -17,7 +17,9 @@ def load_template(agent: str, variant: str = "default") -> Dict[str, str]:
         raise IOError(f"Error loading or parsing YAML template: {fp}\n{e}") from e
 
 
-def build_prompt(agent: str, ctx: Dict[str, Any], variant: str = "default") -> List[Dict[str, str]]:
+def build_prompt(
+    agent: str, ctx: Dict[str, Any], variant: str = "default"
+) -> List[Dict[str, str]]:
     """
     参数:
       agent   —— 例如 'block_parse'
@@ -30,7 +32,9 @@ def build_prompt(agent: str, ctx: Dict[str, Any], variant: str = "default") -> L
 
     # Ensure required keys exist in template
     if "system" not in tpl or "scene" not in tpl:
-        raise ValueError(f"Template for agent '{agent}' variant '{variant}' is missing 'system' or 'scene' key.")
+        raise ValueError(
+            f"Template for agent '{agent}' variant '{variant}' is missing 'system' or 'scene' key."
+        )
 
     # ① Check for optional {{maxLen}} injection (before formatting)
     # Use double braces {{maxLen}} specifically for this check as per user doc
@@ -56,7 +60,9 @@ def build_prompt(agent: str, ctx: Dict[str, Any], variant: str = "default") -> L
         ) from None
     except Exception as e:
         # Catch other potential formatting errors
-        raise ValueError(f"Error formatting scene for agent '{agent}' with provided context: {e}") from e
+        raise ValueError(
+            f"Error formatting scene for agent '{agent}' with provided context: {e}"
+        ) from e
 
     return [
         {"role": "system", "content": tpl["system"]},

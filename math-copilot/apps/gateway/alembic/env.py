@@ -19,21 +19,31 @@ if config.config_file_name is not None:
 # target_metadata = None
 
 # ★ 指向工程里的 engine 和 SQLModel
-import pathlib
-import sys
+import pathlib  # noqa: E402
+import sys  # noqa: E402
 
 # Add project root to sys.path to allow importing apps.gateway.db
 # Assuming env.py is in apps/gateway/alembic, and project root is 3 levels up.
-PROJECT_ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
+PROJECT_ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from sqlmodel import SQLModel  # ★
-from sqlmodel.sql.sqltypes import GUID, AutoString  # MODIFIED: Import AutoString
+from sqlmodel import SQLModel  # ★ # noqa: E402
+from sqlmodel.sql.sqltypes import (
+    GUID,
+    AutoString,
+)  # MODIFIED: Import AutoString # noqa: E402
 
-from apps.gateway.db import DB_URL  # ★ Changed from engine to DB_URL as per typical alembic setup
+from apps.gateway.db import (
+    DB_URL,
+)  # ★ Changed from engine to DB_URL as per typical alembic setup # noqa: E402
+
+# Import all models to ensure they are registered with SQLModel metadata
+from apps.gateway.models import *  # noqa: F401, F403, E402 ★ Import all models
 
 target_metadata = SQLModel.metadata  # ★
-config.set_main_option("sqlalchemy.url", DB_URL)  # ★ Set the sqlalchemy.url from our db.py
+config.set_main_option(
+    "sqlalchemy.url", DB_URL
+)  # ★ Set the sqlalchemy.url from our db.py
 
 
 # Custom render_item function for SQLModel types
@@ -99,7 +109,11 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata, render_item=render_item)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            render_item=render_item,
+        )
 
         with context.begin_transaction():
             context.run_migrations()

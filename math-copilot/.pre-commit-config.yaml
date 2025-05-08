@@ -18,7 +18,5 @@ repos:
     rev: v1.10.1 # Use a recent tag
     hooks:
     -   id: mypy
-        # You might need to specify additional args depending on your mypy config in pyproject.toml
-        # args: [--config-file=pyproject.toml]
-        # If using a Python version constraint:
-        # additional_dependencies: ['types-PyYAML'] # Example if mypy needs types
+        args: [--config-file=pyproject.toml] # Explicitly point to config
+        additional_dependencies: ['types-PyYAML'] # Add dependency for PyYAML stubs
