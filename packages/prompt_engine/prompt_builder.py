@@ -1,29 +1,20 @@
 from pathlib import Path
 import yaml
+from typing import List, Dict, Any
 import json # For the __main__ test block
 
 PROMPT_DIR = Path(__file__).parent / "prompts"
 
-def load_template(agent: str, variant: str = "default") -> dict:
+def load_template(agent: str, variant: str = "default") -> Dict[str, str]:
     fp = PROMPT_DIR / agent / f"{variant}.yaml"
-    # Robust check: if variant is not default and not found, try default
-    if not fp.exists() and variant != "default":
-        default_fp = PROMPT_DIR / agent / "default.yaml"
-        if default_fp.exists():
-            # print(f"Warning: Prompt template for agent '{agent}', variant '{variant}' not found at {fp}. Falling back to 'default.yaml'.")
-            fp = default_fp
-        else:
-            raise FileNotFoundError(f"Prompt template not found for agent '{agent}': neither variant '{variant}' ({fp.name}) nor default.yaml ({default_fp.name}) exists in {PROMPT_DIR / agent}")
-    elif not fp.exists() and variant == "default":
-        raise FileNotFoundError(f"Default prompt template not found for agent '{agent}': {fp} does not exist.")
-    
+    if not fp.exists():
+        raise FileNotFoundError(f"Prompt template not found at: {fp}")
     try:
-        return yaml.safe_load(fp.read_text(encoding='utf-8'))
+        return yaml.safe_load(fp.read_text(encoding="utf-8"))
     except Exception as e:
-        # Catching generic Exception but providing specific context
-        raise ValueError(f"Error loading or parsing YAML template {fp}: {e}")
+        raise IOError(f"Error loading or parsing YAML template: {fp}\n{e}") from e
 
-def build_prompt(agent: str, ctx: dict, variant: str = "default") -> list:
+def build_prompt(agent: str, ctx: Dict[str, Any], variant: str = "default") -> List[Dict[str, str]]:
     """
     参数:
       agent   —— 例如 'block_parse'
@@ -32,25 +23,35 @@ def build_prompt(agent: str, ctx: dict, variant: str = "default") -> list:
     返回:
       List[dict]  可直接送入 openai.ChatCompletion
     """
-    tpl = load_template(agent, variant) # load_template now handles FileNotFoundError robustly
+    tpl = load_template(agent, variant)
 
-    if not isinstance(tpl, dict):
-        raise ValueError(f"Loaded template for agent '{agent}', variant '{variant}' is not a dictionary. Content: {tpl}")
-
+    # Ensure required keys exist in template
     if "system" not in tpl or "scene" not in tpl:
-        raise ValueError(f"Template for agent '{agent}', variant '{variant}' is missing 'system' or 'scene' key. Keys found: {list(tpl.keys())}")
+        raise ValueError(f"Template for agent '{agent}' variant '{variant}' is missing 'system' or 'scene' key.")
 
-    # Default for {{maxLen}} if used in scene and not provided in ctx
-    if "{{maxLen}}" in tpl["scene"] and "maxLen" not in ctx:
-        ctx["maxLen"] = 1000                # 摘要默认 1000 字
-    
+    # ① Check for optional {{maxLen}} injection (before formatting)
+    # Use double braces {{maxLen}} specifically for this check as per user doc
+    max_len_placeholder = "{{maxLen}}" 
+    if max_len_placeholder in tpl.get("scene", "") and "maxLen" not in ctx:
+        ctx["maxLen"] = 1000 # Default value
+        # We need to remove the placeholder from the template string 
+        # if it won't be replaced by format(), otherwise format() might complain 
+        # depending on the Python version and exact string content.
+        # However, removing it might alter intended structure if not careful.
+        # A safer approach if {{maxLen}} is ONLY for this check:
+        # tpl["scene"] = tpl["scene"].replace(max_len_placeholder, str(ctx["maxLen"]))
+        # Let's assume for now that if {{maxLen}} is present, it WILL be in ctx after this.
+        # If not, format() will handle it (or raise error if it looks like {maxLen}).
+
+    # ② Format the scene using single-braced placeholders {placeholder}
     try:
         scene = tpl["scene"].format(**ctx)
     except KeyError as e:
-        # Provide more context on the missing key and available keys in ctx
-        raise KeyError(f"Missing placeholder {e} in context for agent '{agent}', variant '{variant}'. Scene expects it. Provided context keys: {list(ctx.keys())}. Template scene: {tpl['scene'][:200]}...")
+        missing_key = e.args[0]
+        raise KeyError(f"Context ('ctx') is missing required placeholder key '{missing_key}' for agent '{agent}'.") from None
     except Exception as e:
-        raise ValueError(f"Error formatting scene for agent '{agent}', variant '{variant}' with context {list(ctx.keys())}: {e}")
+        # Catch other potential formatting errors
+        raise ValueError(f"Error formatting scene for agent '{agent}' with provided context: {e}") from e
 
     return [
         {"role": "system", "content": tpl["system"]},

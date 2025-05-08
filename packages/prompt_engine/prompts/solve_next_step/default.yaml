@@ -1,13 +1,13 @@
 system: 依据"选中思路"继续推导下一步。
 scene: |
   题干:
-  {{rawLatex}}
+  {rawLatex}
 
-  选中思路 (来源: {{suggest_source}}):
-  {{chosen_suggestion}}
+  选中思路 (来源: {suggest_source}):
+  {chosen_suggestion}
 
   最近历史:
-  {{history_brief}}
+  {history_brief}
 
   返回:
   {{

@@ -1,9 +1,9 @@
-system: 循环推导，直到解决或发现无法继续。
+system: 循环推导直到解决或卡住，每次仅返回下一步。
 scene: |
-  题干 LaTeX:
-  {{rawLatex}}
+  题干:
+  {rawLatex}
 
-  返回：
+  返回:
   {{
     "latex":"<LaTeX>",
     "explanation":"<一句中文>",
