@@ -28,14 +28,14 @@ PROJECT_ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from sqlmodel import SQLModel  # ★ # noqa: E402
-from sqlmodel.sql.sqltypes import (
+from sqlmodel.sql.sqltypes import (  # noqa: E402
     GUID,
     AutoString,
-)  # MODIFIED: Import AutoString # noqa: E402
+)  # MODIFIED: Import AutoString
 
-from apps.gateway.db import (
+from apps.gateway.db import (  # noqa: E402
     DB_URL,
-)  # ★ Changed from engine to DB_URL as per typical alembic setup # noqa: E402
+)  # ★ Changed from engine to DB_URL as per typical alembic setup
 
 # Import all models to ensure they are registered with SQLModel metadata
 from apps.gateway.models import *  # noqa: F401, F403, E402 ★ Import all models

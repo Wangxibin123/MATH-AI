@@ -54,5 +54,6 @@ line-length = 120
 # Example minimal configuration
 python_version = "3.11"
 ignore_missing_imports = true
+exclude = ["scripts/"] # Exclude the entire scripts directory
 # warn_return_any = true
 # warn_unused_configs = true
