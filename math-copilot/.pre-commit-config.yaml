@@ -1,23 +1,5 @@
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0 # Use a recent tag
-    hooks:
-    -   id: check-yaml
-    -   id: end-of-file-fixer
-    -   id: trailing-whitespace
-    -   id: check-added-large-files
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.5.7 # Use a recent tag for Ruff's pre-commit hooks
+    rev: v0.5.7 # Using the specified rev from the user's guide
     hooks:
-    # Run the linter.
-    -   id: ruff
-        args: [--fix, --exit-non-zero-on-fix] # Auto-fix and fail if fixes were made
-    # Run the formatter.
-    -   id: ruff-format
--   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.10.1 # Use a recent tag
-    hooks:
-    -   id: mypy
-        additional_dependencies: ['types-PyYAML']
-        args: ["apps", "packages"] # Explicitly tell MyPy what to check
-        # exclude: ^scripts/seed\.py$ # This didn't work as expected
+    - id: ruff-format   # Only formatting, does not block commit

@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     # ==== DATABASE =========================================================
-    DB_URL: str = "sqlite:///dev.db"
+    DB_URL: str | None = None
 
     # ==== LLM KEYS =========================================================
     OPENAI_API_KEY: str | None = None
@@ -26,6 +26,12 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
     )
+
+    @property
+    def SQLALCHEMY_DATABASE_URI(self) -> str:
+        if self.DB_URL:
+            return self.DB_URL
+        return "sqlite:////tmp/math_copilot_dev.db"
 
 
 settings = Settings()

@@ -16,6 +16,7 @@ class Block(SQLModel, table=True):
     latex: str
     html: Optional[str] = None
     author: str = Field(default="assistant")
+    state: str = Field(default="active", max_length=16)
     isTerminal: bool = Field(default=False)
     createdAt: datetime.datetime = Field(
         default_factory=datetime.datetime.utcnow, nullable=False

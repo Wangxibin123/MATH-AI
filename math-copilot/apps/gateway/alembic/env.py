@@ -1,7 +1,19 @@
 from logging.config import fileConfig
+import pathlib
+import sys
 
-from alembic import context
-from sqlalchemy import engine_from_config, pool
+# -------- 提前把项目根塞进 sys.path --------
+PROJECT_ROOT = pathlib.Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
+
+# -------- 之后的 import 全部加 noqa: E402 --------
+from alembic import context  # noqa: E402
+from sqlalchemy import engine_from_config, pool  # noqa: E402
+
+from apps.gateway.settings import settings  # noqa: E402
+from sqlmodel import SQLModel  # noqa: E402
+from sqlmodel.sql.sqltypes import GUID, AutoString  # noqa: E402
+from apps.gateway.models import *  # noqa: E402,F401,F403
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -18,32 +30,11 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
 
-# ★ 指向工程里的 engine 和 SQLModel
-import pathlib  # noqa: E402
-import sys  # noqa: E402
-
-# Add project root to sys.path to allow importing apps.gateway.db
-# Assuming env.py is in apps/gateway/alembic, and project root is 3 levels up.
-PROJECT_ROOT = pathlib.Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(PROJECT_ROOT))
-
-from sqlmodel import SQLModel  # ★ # noqa: E402
-from sqlmodel.sql.sqltypes import (  # noqa: E402
-    GUID,
-    AutoString,
-)  # MODIFIED: Import AutoString
-
-from apps.gateway.db import (  # noqa: E402
-    DB_URL,
-)  # ★ Changed from engine to DB_URL as per typical alembic setup
-
-# Import all models to ensure they are registered with SQLModel metadata
-from apps.gateway.models import *  # noqa: F401, F403, E402 ★ Import all models
-
 target_metadata = SQLModel.metadata  # ★
 config.set_main_option(
-    "sqlalchemy.url", DB_URL
-)  # ★ Set the sqlalchemy.url from our db.py
+    "sqlalchemy.url",
+    settings.SQLALCHEMY_DATABASE_URI,  # ★ Use URI from settings
+)
 
 
 # Custom render_item function for SQLModel types

@@ -1,32 +1,34 @@
 import pytest
 from sqlmodel import select
+from sqlalchemy import delete
 
-from apps.gateway.db import DB_FILE, get_session
+from apps.gateway.db import get_session
 from apps.gateway.models import Block, Problem  # Added Problem
 
 
 @pytest.fixture(scope="module", autouse=True)
 def _fresh_db():
-    # Ensure a clean state before tests
-    if DB_FILE.exists():
-        DB_FILE.unlink()
+    # Database file creation and deletion is handled by the CI script
+    # (rm /tmp/math_copilot_dev.db and alembic upgrade head).
+    # This fixture's main role is now to ensure seed data is populated after clearing tables.
 
     # Alembic should have created the tables via 'alembic upgrade head'.
-    # The seed script also calls init_db(), which is idempotent.
-    # init_db() # Not strictly necessary here if alembic ran, but harmless.
+    # The seed script also calls init_db(), which is idempotent and now uses the
+    # engine configured for /tmp (or DB_URL env var).
 
-    # Run the seed script to populate data
-    # Ensure scripts directory is in python path for import
-    # This usually works if tests are run from project root
+    # Clear existing data from tables before seeding to ensure a clean slate for this module's tests
+    with get_session() as s:
+        s.execute(delete(Block))
+        s.execute(delete(Problem))
+        s.commit()
+
     from scripts import seed
 
     seed.main()
 
-    yield  # séparation entre la configuration et le nettoyage
+    yield
 
-    # Clean up the database file after tests
-    if DB_FILE.exists():
-        DB_FILE.unlink(missing_ok=True)
+    # No cleanup of DB file here; CI script handles it on next run.
 
 
 def test_block_count():
