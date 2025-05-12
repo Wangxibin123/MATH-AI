@@ -14,8 +14,11 @@ from apps.gateway.services.event_bus import publish
 class BlockService:
     """负责 Block CRUD + 事件发布，保证 orderIndex 连续。"""
 
+    problem_id: uuid.UUID | None  # 明确声明属性以供 mypy 识别
+
     def __init__(self, db: Session):
         self.db = db
+        self.problem_id = None  # 初始化为 None
 
     # ---------- internal ----------
     def _next_index(self, problem_id: uuid.UUID) -> int:
