@@ -110,7 +110,7 @@ def load_yaml_or_fallback(agent: str, meta: Dict[str, str]) -> Dict[str, str]:
     # 注意：不是所有 meta key 都会参与文件名构造，取决于该 agent 的维度
     # 例如，problem_ingest 主要看 modality
     # suggest_next_moves 主要看 type, depth, rag
-    
+
     # 简化版 key 构造逻辑 (需要根据实际 agent 维度细化)
     parts = [meta.get('type', 'default')]
     if 'depth' in meta: # 假设 depth, rag, auto 对很多 agent 通用
@@ -119,10 +119,10 @@ def load_yaml_or_fallback(agent: str, meta: Dict[str, str]) -> Dict[str, str]:
         parts.append('rag' if meta['rag'] == 'yes' else 'no_rag')
     if meta.get('auto') == 'on':
         parts.append('auto_on')
-    
+
     filename_parts = [p for p in parts if p] # 过滤掉 None 或空字符串
     specific_filename = "_".join(filename_parts) + ".yaml"
-    
+
     # problem_ingest 特殊处理 modality
     if agent == 'problem_ingest' and 'modality' in meta:
         specific_filename = meta['modality'] + ".yaml"
@@ -166,10 +166,10 @@ def build_prompt_messages(agent: str, meta: Dict[str, str], context_data: Dict[s
         [{"role":"system","content":"..."}, {"role":"user","content":"..."}]
     """
     template_content = load_yaml_or_fallback(agent, meta)
-    
+
     system_prompt = template_content.get("system", "")
     scene_template = template_content.get("scene", "") # Scene template from YAML
-    
+
     # 使用 context_data 填充 scene_template 中的占位符
     # 注意: 要确保 context_data 包含了 scene_template 中所有需要的 key
     # 可以使用更安全的格式化方法，比如 string.Template 或 Jinja2
@@ -184,9 +184,9 @@ def build_prompt_messages(agent: str, meta: Dict[str, str], context_data: Dict[s
         messages.append({"role": "system", "content": system_prompt})
     if user_content:
         messages.append({"role": "user", "content": user_content})
-        
+
     # 此处还可以根据需要添加 few-shot examples 到 messages 中
-    # few_shot_examples = load_few_shot_examples(agent, meta) 
+    # few_shot_examples = load_few_shot_examples(agent, meta)
     # messages.extend(few_shot_examples) # before the final user message or interleaved
 
     return messages
@@ -275,4 +275,4 @@ scene: |
 *   **性能与成本考量**: 虽然 Prompt 变体可能很多，但在运行时，`PromptBuilder` 应确保只加载和格式化当前场景命中的那一个模板。避免将所有可能的文本片段都塞在同一个 LLM 请求中，这会严重影响性能和成本。
 *   **Few-shot 示例库**: 考虑建立一个按题型、难度等分类的 Few-shot 示例库，`PromptBuilder` 可以根据 `meta` 动态选择合适的示例注入到 Prompt 中，以进一步提升模型表现。
 
-如需我 给出任意一套完整模板示例文件 或 `PromptBuilder` 的完整 Python 实现，请直接告诉我！ 
+如需我 给出任意一套完整模板示例文件 或 `PromptBuilder` 的完整 Python 实现，请直接告诉我！

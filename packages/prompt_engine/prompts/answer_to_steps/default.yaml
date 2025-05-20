@@ -1,7 +1,0 @@
-system: 把整份答案拆成连贯最小步骤。
-scene: |
-  学生答案文本:
-  {answer_raw}
-
-  返回:
-  {{"blocks":[{{"latex":"...","explanation":"..."}}, ...]}} 

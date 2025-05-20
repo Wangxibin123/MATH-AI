@@ -69,7 +69,7 @@ sequenceDiagram
   GW->>B:  update root.latex
   B->>E:   publish edit
   B-->>D:  (无 DAG 变更)
-  FE<--E:  WS push edit
+  E-->>FE:  WS push edit
 ```
 
 **要点**: 只改題幹文本，不改 DAG；如果需重新解析则前端再发 /blocks/:id/parse。
@@ -99,7 +99,7 @@ sequenceDiagram
   FE->>GW: PATCH /blocks/5 {latex}
   GW->>B:  update block#5
   B->>E:   publish block_edit
-  FE<--E:  WS 更新块
+  E-->>FE:  WS 更新块
 ```
 
 ⸻
@@ -286,4 +286,4 @@ data: JSON_STRING
 	•	所有 sequence 图均确保 事件写入 → 服务写 DB → DagState 校正 → WS 推前端 这一顺序一致。
 	•	若后期出现跨标签页协同，可把 Event-Bus 替换为 Postgres LISTEN/NOTIFY 或 Y.js CRDT，同样兼容 React Flow。
 
-如还需更多细节（布局参数、WS 协议示例、Orchestrator 测试脚本等），随时告诉我！ 
+如还需更多细节（布局参数、WS 协议示例、Orchestrator 测试脚本等），随时告诉我！
