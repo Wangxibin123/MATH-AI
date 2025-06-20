@@ -5,7 +5,7 @@ Pydantic 数据契约 —— Math-Copilot 9 个 Agent 的输入/输出 Schema
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -18,7 +18,7 @@ class _FirstStep(BaseModel):
 
 class ProblemIngest(BaseModel):
     rawLatex: str
-    firstStep: _FirstStep
+    firstStep: Dict[str, str]
     problemTask: str
 
 
@@ -42,6 +42,7 @@ class SuggestNextMoves(BaseModel):
 class SolveNextStep(BaseModel):
     latex: str
     explanation: str
+    finished: bool
 
 
 # 6. solve_to_end -----------------------------------------------------------
@@ -69,6 +70,25 @@ class Candidates(BaseModel):
     altOutputs: List[Dict[str, Any]]
 
 
+# 10. explain_step -----------------------------------------------------------
+class ExplainStep(BaseModel):
+    explanation: str
+
+
+# 11. verify_step_forward -----------------------------------------------------
+class VerifyStepForward(BaseModel):
+    is_correct: bool
+    explanation: str
+    error_reason: Optional[str] = None
+
+
+# 12. verify_step_backward -----------------------------------------------------
+class VerifyStepBackward(BaseModel):
+    is_correct: bool
+    explanation: str
+    error_reason: Optional[str] = None
+
+
 # ---- 映射表：名字即 Agent ID ----------------------------------------------
 SCHEMA_MAP: dict[str, type[BaseModel]] = {
     "problem_ingest": ProblemIngest,
@@ -80,4 +100,7 @@ SCHEMA_MAP: dict[str, type[BaseModel]] = {
     "summarize_history": SummarizeHistory,
     "answer_to_steps": AnswerToSteps,
     "candidates": Candidates,
+    "explain_step": ExplainStep,
+    "verify_step_forward": VerifyStepForward,
+    "verify_step_backward": VerifyStepBackward
 }

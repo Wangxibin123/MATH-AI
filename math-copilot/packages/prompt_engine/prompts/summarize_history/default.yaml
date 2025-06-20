@@ -1,5 +1,5 @@
 system: |
-  请输出题目整体解题摘要，字数不超过 {{maxLen}} 字。
+  请输出题目整体解题中文摘要，字数不超过 {{maxLen}} 字。
 scene: |
   题干:
   {rawLatex}

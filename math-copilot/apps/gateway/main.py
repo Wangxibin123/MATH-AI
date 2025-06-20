@@ -1,4 +1,7 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from apps.gateway.logging_setup import (
     setup_logging,
@@ -43,7 +46,22 @@ from apps.gateway.routers import llm as llm_router_definition  # noqa: E402
 # app.include_router(blocks_router.router) # Removed blocks_router for v0.3.1
 app.include_router(llm_router_definition.router)
 
+# 添加 CORS 中间件
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 允许所有来源
+    allow_credentials=True,
+    allow_methods=["*"],  # 允许所有方法
+    allow_headers=["*"],  # 允许所有头部
+)
+
+# 挂载静态文件目录
+app.mount("/static", StaticFiles(directory="apps/gateway/static"), name="static")
 
 @app.get("/", tags=["Root"])
 async def read_root():
     return {"message": "Welcome to Math Copilot API v0.3.1"}
+
+@app.get("/test")
+async def test():
+    return FileResponse("apps/gateway/static/test.html")

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Copilot Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .input-section {
+            flex: 1;
+        }
+        .output-section {
+            flex: 1;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        select {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            white-space: pre-wrap;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            min-height: 200px;
+        }
+        .step-buttons {
+            margin-top: 10px;
+        }
+        .step-buttons button {
+            background-color: #2196F3;
+        }
+        .step-buttons button:hover {
+            background-color: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Math Copilot Test</h1>
+    <div class="container">
+        <div class="input-section">
+            <h2>输入</h2>
+            <div class="mb-3">
+                <label for="agent" class="form-label">选择 Agent</label>
+                <select class="form-select" id="agent">
+                    <option value="problem_ingest">problem_ingest</option>
+                    <option value="latex_refine">latex_refine</option>
+                    <option value="suggest_next_moves">suggest_next_moves</option>
+                    <option value="solve_next_step">solve_next_step</option>
+                    <option value="summarize_history">summarize_history</option>
+                    <option value="explain_step">explain_step</option>
+                    <option value="verify_step_forward">verify_step_forward</option>
+                    <option value="verify_step_backward">verify_step_backward</option>
+                </select>
+            </div>
+
+            <div id="verifyStepInputs" style="display: none;">
+                <div class="mb-3">
+                    <label for="verifyRawLatex" class="form-label">原始 LaTeX</label>
+                    <input type="text" class="form-control" id="verifyRawLatex" placeholder="输入原始 LaTeX">
+                </div>
+                <div class="mb-3">
+                    <label for="verifyCurrentStep" class="form-label">当前步骤</label>
+                    <input type="text" class="form-control" id="verifyCurrentStep" placeholder="输入当前步骤">
+                </div>
+                <div id="verifyForwardInputs">
+                    <div class="mb-3">
+                        <label for="verifyHistorySteps" class="form-label">历史步骤</label>
+                        <textarea class="form-control" id="verifyHistorySteps" rows="3" placeholder="输入历史步骤，每步一行"></textarea>
+                    </div>
+                </div>
+                <div id="verifyBackwardInputs" style="display: none;">
+                    <div class="mb-3">
+                        <label for="verifyFutureSteps" class="form-label">后续步骤</label>
+                        <textarea class="form-control" id="verifyFutureSteps" rows="3" placeholder="输入后续步骤，每步一行"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div id="explainStepInputs" style="display: none;">
+                <div class="mb-3">
+                    <label for="rawLatex" class="form-label">原始 LaTeX</label>
+                    <input type="text" class="form-control" id="rawLatex" placeholder="输入原始 LaTeX">
+                </div>
+                <div class="mb-3">
+                    <label for="historySteps" class="form-label">历史步骤</label>
+                    <textarea class="form-control" id="historySteps" rows="3" placeholder="输入历史步骤，每步一行"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="currentStep" class="form-label">当前步骤</label>
+                    <input type="text" class="form-control" id="currentStep" placeholder="输入当前步骤">
+                </div>
+            </div>
+
+            <div id="defaultInputs">
+                <div class="mb-3">
+                    <label for="rawText" class="form-label">输入文本</label>
+                    <textarea class="form-control" id="rawText" rows="3" placeholder="输入文本"></textarea>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="testAgent()">测试</button>
+            <button class="btn btn-success" onclick="testFullSolution()">完整解题</button>
+        </div>
+        <div class="output-section">
+            <h2>输出</h2>
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        let lastResult = null;
+
+        // 根据选择的 agent 显示不同的输入框
+        document.getElementById('agent').addEventListener('change', function() {
+            const agent = this.value;
+            const defaultInputs = document.getElementById('defaultInputs');
+            const explainStepInputs = document.getElementById('explainStepInputs');
+            const verifyStepInputs = document.getElementById('verifyStepInputs');
+            const verifyForwardInputs = document.getElementById('verifyForwardInputs');
+            const verifyBackwardInputs = document.getElementById('verifyBackwardInputs');
+            
+            defaultInputs.style.display = 'none';
+            explainStepInputs.style.display = 'none';
+            verifyStepInputs.style.display = 'none';
+            
+            if (agent === 'explain_step') {
+                explainStepInputs.style.display = 'block';
+            } else if (agent === 'verify_step_forward' || agent === 'verify_step_backward') {
+                verifyStepInputs.style.display = 'block';
+                verifyForwardInputs.style.display = agent === 'verify_step_forward' ? 'block' : 'none';
+                verifyBackwardInputs.style.display = agent === 'verify_step_backward' ? 'block' : 'none';
+            } else {
+                defaultInputs.style.display = 'block';
+            }
+        });
+
+        async function testAgent() {
+            const agent = document.getElementById('agent').value;
+            let requestBody = {};
+
+            if (agent === 'explain_step') {
+                requestBody = {
+                    rawLatex: document.getElementById('rawLatex').value,
+                    history_steps: document.getElementById('historySteps').value,
+                    current_step: document.getElementById('currentStep').value
+                };
+            } else if (agent === 'verify_step_forward') {
+                requestBody = {
+                    rawLatex: document.getElementById('verifyRawLatex').value,
+                    current_step: document.getElementById('verifyCurrentStep').value,
+                    history_steps: document.getElementById('verifyHistorySteps').value
+                };
+            } else if (agent === 'verify_step_backward') {
+                requestBody = {
+                    rawLatex: document.getElementById('verifyRawLatex').value,
+                    current_step: document.getElementById('verifyCurrentStep').value,
+                    future_steps: document.getElementById('verifyFutureSteps').value
+                };
+            } else {
+                requestBody = {
+                    raw_text: document.getElementById('rawText').value
+                };
+            }
+
+            try {
+                const response = await fetch(`/chat/${agent}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const result = await response.json();
+                document.getElementById('result').textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                document.getElementById('result').textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function testFullSolution() {
+            const input = document.getElementById('input').value;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.textContent = '开始完整解题流程...\n\n';
+            
+            try {
+                const response = await fetch('/chat/solve_complete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ raw_text: input })
+                });
+                
+                const data = await response.json();
+                lastResult = data;
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.textContent = `错误: ${error.message}\n`;
+            }
+        }
+    </script>
+</body>
+</html> 
